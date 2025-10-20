@@ -187,7 +187,7 @@ export class K8sAnalyzer {
     const issues: Issue[] = [];
 
     try {
-      const namespace = options.namespace || (options.allNamespaces ? undefined : 'default');
+      const namespace = options.namespaces?.[0] || (options.allNamespaces ? undefined : 'default');
 
       const response = namespace
         ? await this.k8sApi.listNamespacedPod(namespace)
@@ -299,7 +299,7 @@ export class K8sAnalyzer {
     const issues: Issue[] = [];
 
     try {
-      const namespace = options.namespace || (options.allNamespaces ? undefined : 'default');
+      const namespace = options.namespaces?.[0] || (options.allNamespaces ? undefined : 'default');
 
       const response = namespace
         ? await this.k8sApi.listNamespacedService(namespace)
@@ -335,7 +335,7 @@ export class K8sAnalyzer {
 
     try {
       const appsApi = this.kc.makeApiClient(k8s.AppsV1Api);
-      const namespace = options.namespace || (options.allNamespaces ? undefined : 'default');
+      const namespace = options.namespaces?.[0] || (options.allNamespaces ? undefined : 'default');
 
       const response = namespace
         ? await appsApi.listNamespacedDeployment(namespace)

@@ -20,7 +20,7 @@ export async function analyze(options: AnalyzeOptions) {
       : undefined;
 
     const result = await analyzer.analyze({
-      namespace: options.namespace,
+      namespaces: options.namespace ? [options.namespace] : undefined,
       allNamespaces: options.allNamespaces,
       filters,
     });

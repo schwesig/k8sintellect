@@ -212,6 +212,19 @@ K8sIntellect leverages k8sgpt's powerful analysis capabilities:
 - Proven analyzer ecosystem from k8sgpt community
 - Optional AI explanations (when k8sgpt backend configured)
 
+## Screenshots
+
+### Web Dashboard
+
+![K8sIntellect Dashboard](docs/screenshots/dashboard.png)
+
+The dashboard provides:
+- Namespace selection with multi-select support
+- Resource type filtering (Pod, Deployment, Service, etc.)
+- Real-time cluster analysis
+- Anonymous mode indicator
+- Issue categorization by severity
+
 ## License
 
 Apache-2.0
