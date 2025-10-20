@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K8sIntellect - Kubernetes Analysis Dashboard</title>
+
+    <!-- PatternFly CSS -->
+    <link rel="stylesheet" href="/patternfly/patternfly.css">
+    <link rel="stylesheet" href="/patternfly/patternfly-addons.css">
+
+    <style>
+        /* Clean enterprise design inspired by Red Hat Source */
+        body {
+            font-family: 'Overpass', overpass, helvetica, arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+
+        /* Black header bar */
+        .top-header {
+            background: #151515;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .top-header .anonymous-badge {
+            background: #3e8635;
+            padding: 0.25rem 0.75rem;
+            border-radius: 3px;
+            font-size: 0.875rem;
+        }
+
+        /* Breadcrumb area */
+        .breadcrumb-section {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #d2d2d2;
+        }
+
+        .breadcrumb-section .breadcrumb {
+            color: #6a6e73;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb-section h2 {
+            margin: 0.5rem 0 0 0;
+            font-size: 2rem;
+            font-weight: 400;
+            color: #151515;
+        }
+
+        /* Tab navigation */
+        .tab-nav {
+            background: white;
+            border-bottom: 1px solid #d2d2d2;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0;
+        }
+
+        .tab-nav-item {
+            padding: 1rem 1.5rem;
+            color: #06c;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .tab-nav-item.active {
+            border-bottom-color: #06c;
+            font-weight: 600;
+        }
+
+        .tab-nav-item:hover {
+            border-bottom-color: #06c;
+        }
+
+        /* Main content area */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Red section headers */
+        .section-header {
+            color: #ee0000;
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin: 2rem 0 1rem 0;
+        }
+
+        .section-header:first-child {
+            margin-top: 0;
+        }
+
+        /* Description text */
+        .description-text {
+            color: #151515;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Two-column layout */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Section boxes */
+        .section-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 3px;
+            box-shadow: 0 0 1px rgba(3,3,3,.1);
+        }
+
+        .section-box.gray {
+            background: #f5f5f5;
+            border: 1px solid #d2d2d2;
+        }
+
+        .section-box h3 {
+            color: #ee0000;
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin: 0 0 1rem 0;
+        }
+
+        .section-box h4 {
+            color: #151515;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        .section-box h4:first-of-type {
+            margin-top: 0;
+        }
+
+        /* Form elements */
+        .pf-v5-c-form-control,
+        .pf-v5-c-check__label {
+            font-size: 0.875rem;
+        }
+
+        .pf-v5-c-form__group {
+            margin-bottom: 1rem;
+        }
+
+        .pf-v5-c-form__label-text {
+            font-weight: 600;
+            color: #151515;
+        }
+
+        /* Primary button - Red Hat red */
+        .pf-v5-c-button.pf-m-primary {
+            --pf-v5-c-button--m-primary--BackgroundColor: #ee0000;
+            --pf-v5-c-button--m-primary--hover--BackgroundColor: #c00000;
+            --pf-v5-c-button--m-primary--active--BackgroundColor: #8b0000;
+        }
+
+        /* Filter grid */
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .filters-grid .pf-v5-c-check__label {
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        /* Summary cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 3px;
+            text-align: center;
+            box-shadow: 0 0 1px rgba(3,3,3,.1);
+            border-left: 4px solid;
+        }
+
+        .summary-card .count {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .label {
+            color: #6a6e73;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-card.total {
+            border-left-color: #707070;
+        }
+
+        .summary-card.total .count {
+            color: #151515;
+        }
+
+        .summary-card.critical {
+            border-left-color: #c9190b;
+        }
+
+        .summary-card.critical .count {
+            color: #c9190b;
+        }
+
+        .summary-card.warning {
+            border-left-color: #f0ab00;
+        }
+
+        .summary-card.warning .count {
+            color: #f0ab00;
+        }
+
+        .summary-card.info {
+            border-left-color: #2b9af3;
+        }
+
+        .summary-card.info .count {
+            color: #2b9af3;
+        }
+
+        /* Issue cards */
+        .issue-card {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 3px;
+            border-left: 4px solid;
+            box-shadow: 0 0 1px rgba(3,3,3,.1);
+        }
+
+        .issue-card.critical {
+            border-left-color: #c9190b;
+            background: #faeae8;
+        }
+
+        .issue-card.warning {
+            border-left-color: #f0ab00;
+            background: #fdf7e7;
+        }
+
+        .issue-card.info {
+            border-left-color: #2b9af3;
+            background: #e7f1fa;
+        }
+
+        .issue-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .issue-card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #151515;
+        }
+
+        .issue-card-namespace {
+            color: #6a6e73;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+        }
+
+        .severity-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .severity-badge.critical {
+            background: #c9190b;
+            color: white;
+        }
+
+        .severity-badge.warning {
+            background: #f0ab00;
+            color: #151515;
+        }
+
+        .severity-badge.info {
+            background: #2b9af3;
+            color: white;
+        }
+
+        .issue-card-content {
+            color: #151515;
+            line-height: 1.5;
+        }
+
+        .issue-card-content strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: #151515;
+        }
+
+        .issue-card-content p {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <h1>K8sIntellect</h1>
+        <div style="text-align: right;">
+            <div id="anonymousBadge" class="anonymous-badge">Anonymous Mode</div>
+            <div id="backendInfo" style="font-size: 0.75rem; margin-top: 0.25rem; opacity: 0.8;">Loading...</div>
+            <div id="clusterInfo" style="font-size: 0.75rem; margin-top: 0.25rem; opacity: 0.8;">Loading cluster...</div>
+        </div>
+    </div>
+
+    <!-- Breadcrumb Section -->
+    <div class="breadcrumb-section">
+        <div class="breadcrumb" id="breadcrumb">Kubernetes Analysis</div>
+        <h2>Cluster Health Dashboard</h2>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        <a href="#" class="tab-nav-item active">Analysis</a>
+        <a href="#" class="tab-nav-item">About</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Introduction -->
+        <h2 class="section-header">Analyze your Kubernetes cluster</h2>
+        <p class="description-text">
+            This dashboard uses k8sgpt to analyze your Kubernetes or OpenShift cluster and identify potential issues.
+            All analysis runs locally - no cluster data is sent to external services.
+        </p>
+
+        <!-- Configuration and Controls -->
+        <div class="two-column-layout">
+            <!-- Left: Configuration -->
+            <div class="section-box gray">
+                <h3>Configuration</h3>
+
+                <form class="pf-v5-c-form">
+                    <div class="pf-v5-c-form__group">
+                        <div class="pf-v5-c-form__group-label">
+                            <label class="pf-v5-c-form__label" for="namespace">
+                                <span class="pf-v5-c-form__label-text">Namespaces</span>
+                            </label>
+                        </div>
+                        <div class="pf-v5-c-form__group-control">
+                            <select class="pf-v5-c-form-control" id="namespace" multiple size="8" style="height: auto;">
+                                <option value="">Loading namespaces...</option>
+                            </select>
+                            <p style="font-size: 0.75rem; color: #6a6e73; margin-top: 0.5rem;">
+                                Hold Ctrl (Cmd on Mac) to select multiple namespaces
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="pf-v5-c-form__group">
+                        <div class="pf-v5-c-check">
+                            <input class="pf-v5-c-check__input" type="checkbox" id="allNamespaces" onchange="handleAllNamespacesChange()">
+                            <label class="pf-v5-c-check__label" for="allNamespaces">
+                                Analyze all namespaces
+                            </label>
+                        </div>
+                    </div>
+
+                    <h4>Resource Filters</h4>
+                    <p class="description-text" style="font-size: 0.875rem; margin-bottom: 1rem;">
+                        Select which resource types to analyze. <a href="#" onclick="selectAllFilters(); return false;" style="color: #06c;">Select all</a> |
+                        <a href="#" onclick="deselectAllFilters(); return false;" style="color: #06c;">Deselect all</a>
+                    </p>
+
+                    <div id="filtersGrid" class="filters-grid">
+                        <p style="color: #6a6e73; font-size: 0.875rem;">Loading filters...</p>
+                    </div>
+
+                    <div class="pf-v5-c-form__group" style="margin-top: 1.5rem;">
+                        <button class="pf-v5-c-button pf-m-primary pf-m-block" type="button" id="analyzeBtn" onclick="runAnalysis()">
+                            Analyze Cluster
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right: Information -->
+            <div class="section-box">
+                <h3>About k8sgpt Analysis</h3>
+                <p class="description-text" style="font-size: 0.875rem;">
+                    K8sIntellect provides automated analysis of your Kubernetes cluster using k8sgpt's powerful analyzers.
+                </p>
+
+                <h4>Detected Issues</h4>
+                <ul style="color: #151515; font-size: 0.875rem; line-height: 1.6;">
+                    <li><strong>Pods:</strong> CrashLoopBackOff, Error states, failed containers</li>
+                    <li><strong>Deployments:</strong> Unavailable replicas, rollout issues</li>
+                    <li><strong>Services:</strong> Missing endpoints, connectivity issues</li>
+                    <li><strong>StatefulSets:</strong> Volume mounting, pod failures</li>
+                    <li><strong>And more:</strong> Jobs, Ingress, HPA, NetworkPolicy, etc.</li>
+                </ul>
+
+                <h4>Privacy & Security</h4>
+                <p class="description-text" style="font-size: 0.875rem;">
+                    <strong>Anonymous mode is enabled by default.</strong> All analysis runs locally using k8sgpt.
+                    No cluster data is transmitted to external AI services.
+                </p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let isAnalyzing = false;
+        let availableFilters = [];
+        let savedNamespaceSelection = []; // Store namespace selection when "all namespaces" is checked
+
+        // Handle "All namespaces" checkbox change
+        function handleAllNamespacesChange() {
+            const allNamespacesCheckbox = document.getElementById('allNamespaces');
+            const namespaceSelect = document.getElementById('namespace');
+
+            if (allNamespacesCheckbox.checked) {
+                // Save current selection before clearing
+                savedNamespaceSelection = getSelectedNamespaces();
+
+                // Disable and grey out namespace dropdown
+                namespaceSelect.disabled = true;
+                namespaceSelect.style.opacity = '0.5';
+                namespaceSelect.style.cursor = 'not-allowed';
+
+                // Clear all selections in multi-select
+                for (let option of namespaceSelect.options) {
+                    option.selected = false;
+                }
+            } else {
+                // Re-enable namespace dropdown
+                namespaceSelect.disabled = false;
+                namespaceSelect.style.opacity = '1';
+                namespaceSelect.style.cursor = 'default';
+
+                // Restore previous selection
+                if (savedNamespaceSelection.length > 0) {
+                    for (let option of namespaceSelect.options) {
+                        if (savedNamespaceSelection.includes(option.value)) {
+                            option.selected = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Get selected namespaces from multi-select
+        function getSelectedNamespaces() {
+            const namespaceSelect = document.getElementById('namespace');
+            const selected = Array.from(namespaceSelect.selectedOptions).map(opt => opt.value);
+            return selected.filter(ns => ns !== ''); // Filter out empty values
+        }
+
+        // Load available namespaces
+        async function loadNamespaces() {
+            try {
+                const response = await fetch('/api/namespaces');
+                const data = await response.json();
+                const namespaces = data.namespaces;
+
+                const namespaceSelect = document.getElementById('namespace');
+                namespaceSelect.innerHTML = namespaces.map(ns => `<option value="${ns}">${ns}</option>`).join('');
+            } catch (error) {
+                console.error('Failed to load namespaces:', error);
+                const namespaceSelect = document.getElementById('namespace');
+                namespaceSelect.innerHTML = '<option value="">Failed to load namespaces</option>';
+            }
+        }
+
+        // Load available filters
+        async function loadFilters() {
+            try {
+                const response = await fetch('/api/filters');
+                const data = await response.json();
+                availableFilters = data.filters;
+
+                const filtersGrid = document.getElementById('filtersGrid');
+                filtersGrid.innerHTML = availableFilters.map(filter => `
+                    <div class="pf-v5-c-check">
+                        <input class="pf-v5-c-check__input" type="checkbox" id="filter-${filter}" value="${filter}" checked>
+                        <label class="pf-v5-c-check__label" for="filter-${filter}">
+                            ${filter}
+                        </label>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load filters:', error);
+                const filtersGrid = document.getElementById('filtersGrid');
+                filtersGrid.innerHTML = '<p style="color: red;">Failed to load filters</p>';
+            }
+        }
+
+        // Select all filters
+        function selectAllFilters() {
+            availableFilters.forEach(filter => {
+                const checkbox = document.getElementById(`filter-${filter}`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+
+        // Deselect all filters
+        function deselectAllFilters() {
+            availableFilters.forEach(filter => {
+                const checkbox = document.getElementById(`filter-${filter}`);
+                if (checkbox) checkbox.checked = false;
+            });
+        }
+
+        // Get selected filters
+        function getSelectedFilters() {
+            return availableFilters.filter(filter => {
+                const checkbox = document.getElementById(`filter-${filter}`);
+                return checkbox && checkbox.checked;
+            });
+        }
+
+        // Load and display anonymous mode status
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                const badge = document.getElementById('anonymousBadge');
+                const backendInfo = document.getElementById('backendInfo');
+                const clusterInfo = document.getElementById('clusterInfo');
+                const breadcrumb = document.getElementById('breadcrumb');
+
+                if (data.anonymousMode) {
+                    badge.style.background = '#3e8635';
+                    badge.textContent = 'Anonymous Mode';
+                } else {
+                    badge.style.background = '#c9190b';
+                    badge.textContent = 'External AI Enabled';
+                }
+
+                // Display backend/LLM information
+                if (data.backend && data.backend.provider) {
+                    const providerName = data.backend.provider.charAt(0).toUpperCase() + data.backend.provider.slice(1);
+                    backendInfo.textContent = `LLM: ${providerName}`;
+                } else {
+                    backendInfo.textContent = 'LLM: LocalAI';
+                }
+
+                // Display cluster information
+                if (data.cluster) {
+                    let clusterText = `Cluster: ${data.cluster.name || data.cluster.context}`;
+                    // Optionally show server URL (truncated if too long)
+                    if (data.cluster.server) {
+                        const serverUrl = new URL(data.cluster.server);
+                        clusterText += ` (${serverUrl.hostname})`;
+                    }
+                    clusterInfo.textContent = clusterText;
+                } else {
+                    clusterInfo.textContent = 'Cluster: Unknown';
+                }
+
+                // Update breadcrumb with k8sgpt version
+                if (data.k8sgptVersion && data.k8sgptVersion !== 'unknown') {
+                    breadcrumb.textContent = `Kubernetes Analysis based on k8sgpt v${data.k8sgptVersion}`;
+                } else {
+                    breadcrumb.textContent = 'Kubernetes Analysis based on k8sgpt';
+                }
+            } catch (error) {
+                console.error('Failed to load status:', error);
+                const backendInfo = document.getElementById('backendInfo');
+                const clusterInfo = document.getElementById('clusterInfo');
+                backendInfo.textContent = 'LLM: Unknown';
+                clusterInfo.textContent = 'Cluster: Unknown';
+            }
+        }
+
+        // Load status, namespaces and filters on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStatus();
+            loadNamespaces();
+            loadFilters();
+        });
+
+        async function runAnalysis() {
+            if (isAnalyzing) return;
+
+            isAnalyzing = true;
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="pf-v5-c-spinner pf-m-sm" role="progressbar"></span> Analyzing...';
+
+            const allNamespaces = document.getElementById('allNamespaces').checked;
+            const selectedNamespaces = allNamespaces ? [] : getSelectedNamespaces();
+            const selectedFilters = getSelectedFilters();
+
+            if (selectedFilters.length === 0) {
+                alert('Please select at least one resource filter');
+                isAnalyzing = false;
+                btn.disabled = false;
+                btn.textContent = 'Analyze Cluster';
+                return;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            const namespaceText = allNamespaces ? 'all namespaces' :
+                                 selectedNamespaces.length > 0 ? `${selectedNamespaces.length} namespace(s)` : 'default namespace';
+            resultsDiv.innerHTML = `
+                <div style="text-align: center; padding: 3rem 0;">
+                    <div class="pf-v5-c-spinner pf-m-xl" role="progressbar"></div>
+                    <p style="margin-top: 1rem; color: #6a6e73;">Analyzing ${namespaceText} with ${selectedFilters.length} filter(s)...</p>
+                </div>
+            `;
+
+            try {
+                const params = new URLSearchParams();
+                // Handle namespace selection
+                if (allNamespaces) {
+                    params.append('allNamespaces', 'true');
+                } else if (selectedNamespaces.length > 0) {
+                    // Send multiple namespaces as comma-separated list
+                    params.append('namespaces', selectedNamespaces.join(','));
+                }
+                if (selectedFilters.length > 0) {
+                    params.append('filters', selectedFilters.join(','));
+                }
+
+                const response = await fetch(`/api/analyze?${params}`);
+                const data = await response.json();
+
+                displayResults(data);
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="section-box" style="margin-top: 2rem; border-left: 4px solid #c9190b;">
+                        <h3 style="color: #c9190b;">Analysis Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                isAnalyzing = false;
+                btn.disabled = false;
+                btn.textContent = 'Analyze Cluster';
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+
+            let html = `
+                <h2 class="section-header">Analysis Results</h2>
+                <p class="description-text">
+                    Cluster: <strong>${data.cluster}</strong> |
+                    Analyzed: ${new Date(data.timestamp).toLocaleString()}
+                </p>
+
+                <div class="summary-cards">
+                    <div class="summary-card total">
+                        <div class="count">${data.summary.total}</div>
+                        <div class="label">Total Issues</div>
+                    </div>
+                    <div class="summary-card critical">
+                        <div class="count">${data.summary.critical}</div>
+                        <div class="label">Critical</div>
+                    </div>
+                    <div class="summary-card warning">
+                        <div class="count">${data.summary.warning}</div>
+                        <div class="label">Warnings</div>
+                    </div>
+                    <div class="summary-card info">
+                        <div class="count">${data.summary.info}</div>
+                        <div class="label">Info</div>
+                    </div>
+                </div>
+            `;
+
+            // Show k8sgpt commands if available
+            if (data.commands && data.commands.length > 0) {
+                html += `
+                    <details style="margin: 1.5rem 0; padding: 1rem; background: #f5f5f5; border-radius: 3px; border: 1px solid #d2d2d2;">
+                        <summary style="cursor: pointer; font-weight: 600; color: #151515; user-select: none;">
+                            k8sgpt Commands (${data.commands.length})
+                        </summary>
+                        <div style="margin-top: 1rem;">
+                            ${data.commands.map(cmd => `
+                                <div style="background: #151515; color: #00ff00; padding: 0.75rem; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 0.875rem; margin-bottom: 0.5rem; overflow-x: auto;">
+                                    <code>$ ${cmd}</code>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </details>
+                `;
+            }
+
+            if (data.issues && data.issues.length > 0) {
+                html += `<h3 style="font-size: 1.25rem; margin: 2rem 0 1rem 0; color: #151515;">Issues Detected</h3>`;
+
+                data.issues.forEach(issue => {
+                    html += `
+                        <div class="issue-card ${issue.severity}">
+                            <div class="issue-card-header">
+                                <div>
+                                    <span class="issue-card-title">${issue.kind}: ${issue.name}</span>
+                                    ${issue.namespace ? `<span class="issue-card-namespace">${issue.namespace}</span>` : ''}
+                                </div>
+                                <span class="severity-badge ${issue.severity}">${issue.severity}</span>
+                            </div>
+                            <div class="issue-card-content">
+                                <p><strong>Problem:</strong> ${issue.problem}</p>
+                                ${issue.solution ? `<p><strong>Solution:</strong> ${issue.solution}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `
+                    <div class="section-box" style="margin-top: 2rem; border-left: 4px solid #3e8635; background: #f3faf2;">
+                        <h3 style="color: #3e8635;">No Issues Found</h3>
+                        <p>Your cluster appears healthy. No issues were detected by k8sgpt.</p>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
