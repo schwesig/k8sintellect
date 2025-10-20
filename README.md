@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/assets/logo/k8sintellect-logo.svg" alt="K8sIntellect Logo" width="200">
+</p>
+
 # K8sIntellect
 
 Web dashboard for OpenShift/Kubernetes cluster analysis powered by k8sgpt.

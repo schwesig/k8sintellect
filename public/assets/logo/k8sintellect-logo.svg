@@ -1,0 +1,58 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#0066CC" opacity="0.1"/>
+
+  <!-- Kubernetes-inspired Hexagon -->
+  <g transform="translate(100, 100)">
+    <!-- Outer hexagon -->
+    <path d="M 0,-60 L 52,-30 L 52,30 L 0,60 L -52,30 L -52,-30 Z"
+          fill="none"
+          stroke="#0066CC"
+          stroke-width="3"
+          opacity="0.8"/>
+
+    <!-- Inner hexagon -->
+    <path d="M 0,-45 L 39,-22.5 L 39,22.5 L 0,45 L -39,22.5 L -39,-22.5 Z"
+          fill="#0066CC"
+          opacity="0.2"/>
+
+    <!-- Brain/Intelligence Symbol - Circuit-like pattern -->
+    <g stroke="#0066CC" stroke-width="2.5" fill="none" stroke-linecap="round">
+      <!-- Neural connections -->
+      <path d="M -20,-10 Q -10,-5 0,0" opacity="0.9"/>
+      <path d="M 0,0 Q 10,5 20,10" opacity="0.9"/>
+      <path d="M -15,10 Q 0,8 15,10" opacity="0.9"/>
+      <path d="M 0,0 L 0,-15" opacity="0.9"/>
+      <path d="M 0,0 L -12,12" opacity="0.9"/>
+      <path d="M 0,0 L 12,12" opacity="0.9"/>
+    </g>
+
+    <!-- Neural nodes -->
+    <circle cx="0" cy="0" r="4" fill="#0066CC"/>
+    <circle cx="-20" cy="-10" r="3" fill="#0066CC"/>
+    <circle cx="20" cy="10" r="3" fill="#0066CC"/>
+    <circle cx="0" cy="-15" r="3" fill="#0066CC"/>
+    <circle cx="-12" cy="12" r="3" fill="#0066CC"/>
+    <circle cx="12" cy="12" r="3" fill="#0066CC"/>
+    <circle cx="-15" cy="10" r="2.5" fill="#0066CC"/>
+    <circle cx="15" cy="10" r="2.5" fill="#0066CC"/>
+
+    <!-- Center highlight -->
+    <circle cx="0" cy="0" r="2" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Text: K8s -->
+  <text x="100" y="170"
+        font-family="Overpass, sans-serif"
+        font-size="24"
+        font-weight="600"
+        text-anchor="middle"
+        fill="#0066CC">K8s</text>
+
+  <text x="100" y="188"
+        font-family="Overpass, sans-serif"
+        font-size="16"
+        font-weight="500"
+        text-anchor="middle"
+        fill="#4d4d4d">Intellect</text>
+</svg>

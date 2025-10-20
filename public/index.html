@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>K8sIntellect - Kubernetes Analysis Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/logo/k8sintellect-icon.svg">
 
     <!-- PatternFly CSS -->
     <link rel="stylesheet" href="/patternfly/patternfly.css">
@@ -32,6 +34,14 @@
             margin: 0;
             font-size: 1.5rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .top-header h1 img {
+            height: 40px;
+            width: 40px;
         }
 
         .top-header .anonymous-badge {
@@ -341,7 +351,10 @@
 <body>
     <!-- Top Header -->
     <div class="top-header">
-        <h1>K8sIntellect</h1>
+        <h1>
+            <img src="/assets/logo/k8sintellect-icon.svg" alt="K8sIntellect Logo">
+            K8sIntellect
+        </h1>
         <div style="text-align: right;">
             <div id="anonymousBadge" class="anonymous-badge">Anonymous Mode</div>
             <div id="backendInfo" style="font-size: 0.75rem; margin-top: 0.25rem; opacity: 0.8;">Loading...</div>

@@ -1,0 +1,42 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="32" cy="32" r="30" fill="#0066CC" opacity="0.1"/>
+
+  <!-- Kubernetes-inspired Hexagon -->
+  <g transform="translate(32, 32)">
+    <!-- Outer hexagon -->
+    <path d="M 0,-20 L 17.3,-10 L 17.3,10 L 0,20 L -17.3,10 L -17.3,-10 Z"
+          fill="none"
+          stroke="#0066CC"
+          stroke-width="2"
+          opacity="0.8"/>
+
+    <!-- Inner hexagon -->
+    <path d="M 0,-15 L 13,-7.5 L 13,7.5 L 0,15 L -13,7.5 L -13,-7.5 Z"
+          fill="#0066CC"
+          opacity="0.2"/>
+
+    <!-- Brain/Intelligence Symbol -->
+    <g stroke="#0066CC" stroke-width="1.8" fill="none" stroke-linecap="round">
+      <path d="M -6.5,-3.5 Q -3.5,-2 0,0" opacity="0.9"/>
+      <path d="M 0,0 Q 3.5,2 6.5,3.5" opacity="0.9"/>
+      <path d="M -5,3.5 Q 0,3 5,3.5" opacity="0.9"/>
+      <path d="M 0,0 L 0,-5" opacity="0.9"/>
+      <path d="M 0,0 L -4,4" opacity="0.9"/>
+      <path d="M 0,0 L 4,4" opacity="0.9"/>
+    </g>
+
+    <!-- Neural nodes -->
+    <circle cx="0" cy="0" r="2" fill="#0066CC"/>
+    <circle cx="-6.5" cy="-3.5" r="1.5" fill="#0066CC"/>
+    <circle cx="6.5" cy="3.5" r="1.5" fill="#0066CC"/>
+    <circle cx="0" cy="-5" r="1.5" fill="#0066CC"/>
+    <circle cx="-4" cy="4" r="1.5" fill="#0066CC"/>
+    <circle cx="4" cy="4" r="1.5" fill="#0066CC"/>
+    <circle cx="-5" cy="3.5" r="1.2" fill="#0066CC"/>
+    <circle cx="5" cy="3.5" r="1.2" fill="#0066CC"/>
+
+    <!-- Center highlight -->
+    <circle cx="0" cy="0" r="1" fill="#FFFFFF"/>
+  </g>
+</svg>
